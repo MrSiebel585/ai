@@ -1,0 +1,13 @@
+/opt/omniscient/ai/
+│
+├── bin/                         # Executable scripts and CLI tools
+├── core/                        # Core orchestration logic (e.g. main.py, run_model.py)
+├── modules/                     # Independent logic units (e.g. voice, image, auth)
+├── integrations/                # API wrappers and external service handlers
+├── install/                     # Installation scripts and setup files
+├── models/                      # Model directories (HuggingFace, privateGPT, etc.)
+├── tests/                       # Unit and integration tests
+├── docs/                        # Documentation and markdown files
+├── venv/                        # Python virtual environment
+└── menu.sh                      # Dynamic launcher (see below)
+
