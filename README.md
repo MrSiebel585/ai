@@ -1,0 +1,2 @@
+# ai
+omniscient ai direcrtory
