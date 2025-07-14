@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# Define and export readonly model path
+readonly MODEL_PATH="/opt/omniscient/ai/models/WhiteRabbitNeo-2.5-Qwen-2.5-Coder-7B-IQ2_M.gguf"
+export MODEL_PATH
+
+# Example JSON input (could be replaced by an input file or command output)
+JSON_INPUT='{"model":"default-model","threads":4,"verbose":true}'
+
+# Use jq to update the "model" field with MODEL_PATH
+UPDATED_JSON=$(echo "$JSON_INPUT" | jq --arg model "$MODEL_PATH" '.model = $model')
+
+# Print updated JSON
+echo "Updated JSON config:"
+echo "$UPDATED_JSON"
+
+# Example: pass updated JSON to a CLI that accepts JSON input
+# Replace `echo` below with your actual CLI command
+echo "Running command with updated JSON..."
+echo "$UPDATED_JSON" | your_cli_command --config-json -

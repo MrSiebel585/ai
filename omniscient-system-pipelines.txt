@@ -1,0 +1,16 @@
+
+
+
+alias lmstudio_sys_pipeline="bash -c '{ echo \"### STRUCTURE ###\"; tree -a /opt/omniscient; echo \"\n### FILES ###\"; find /opt/omniscient -type f; } > ~/.lmstudio/conversations/omniscient_meta.txt'"
+
+
+find /opt/omniscient/logs -type f -name '*.log' -exec cat {} + > ~/.lmstudio/conversations/omniscient_combined.log
+
+tree -a /opt/omniscient > ~/.lmstudio/conversations/omniscient_dir_structure.txt
+
+find /opt/omniscient -type f \( -name '*.sh' -o -name '*.py' -o -name '*.bash' -o -name '*.sql' -o -name '*.txt' \) > ~/.lmstudio/conversations/omniscient_scripts_and_files.txt
+
+find /opt/omniscient -type f \( -name '*.conf' -o -name '*.ini' -o -name '*.yaml' -o -name '*.json' \) > ~/.lmstudio/conversations/omniscient_config_files.txt
+
+
+

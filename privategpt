@@ -1,0 +1,196 @@
+# Install PrivateGPT dependencies
+git clone https://github.com/zylon-ai/private-gpt
+cd private-gpt
+pyenv install 3.11
+pyenv local 3.11
+poetry install --extras "ui llms-ollama embeddings-ollama vector-stores-qdrant"
+
+# Install additional dependencies for web scraping
+pip install streamlit selenium beautifulsoup4 requests pandas lxml
+
+
+ollama serve
+ollama pull llama3.1
+ollama pull nomic-embed-text
+
+
+llama_model: "llama3.1"
+embed_model: "nomic-embed-text"
+server_port: 8001
+vector_db: "qdrant"
+
+
+import streamlit as st
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.options import Options
+from bs4 import BeautifulSoup
+import requests
+import json
+import os
+
+# Setup Streamlit UI
+st.set_page_config(page_title="PrivateGPT Web Scraper", layout="wide")
+st.title("🕵️‍♂️ PrivateGPT-Powered Web Scraper")
+
+# Web Scraping Function
+def scrape_website(url):
+    """Scrapes website data using Selenium and BeautifulSoup"""
+    try:
+        # Configure headless Chrome
+        chrome_options = Options()
+        chrome_options.add_argument("--headless")
+        chrome_options.add_argument("--disable-gpu")
+        chrome_options.add_argument("--no-sandbox")
+        chrome_options.add_argument("--disable-dev-shm-usage")
+
+        service = Service("/path/to/chromedriver")  # Adjust path to ChromeDriver
+        driver = webdriver.Chrome(service=service, options=chrome_options)
+
+        # Open the page
+        driver.get(url)
+        html = driver.page_source
+        driver.quit()
+
+        # Parse HTML
+        soup = BeautifulSoup(html, "html.parser")
+        text_content = soup.get_text(separator="\n")
+
+        return text_content[:5000]  # Limit output for processing
+    except Exception as e:
+        return f"Error scraping website: {str(e)}"
+
+# PrivateGPT Query Function
+def query_privategpt(prompt):
+    """Sends prompt to PrivateGPT API for structured analysis"""
+    try:
+        response = requests.post(
+            "http://localhost:8001/api/v1/query",
+            json={"query": prompt},
+            headers={"Content-Type": "application/json"}
+        )
+        data = response.json()
+        return data.get("response", "No response from PrivateGPT")
+    except Exception as e:
+        return f"Error querying PrivateGPT: {str(e)}"
+
+# Streamlit Input
+url = st.text_input("Enter URL to Scrape", placeholder="https://example.com")
+analyze_button = st.button("Scrape & Analyze")
+
+if analyze_button and url:
+    with st.spinner("Scraping website..."):
+        raw_data = scrape_website(url)
+        st.subheader("Raw Scraped Data")
+        st.text_area("Extracted Text", raw_data, height=200)
+
+    with st.spinner("Analyzing with PrivateGPT..."):
+        analysis_result = query_privategpt(f"Analyze the following web data:\n\n{raw_data}")
+        st.subheader("PrivateGPT Analysis")
+        st.write(analysis_result)
+
+
+
+streamlit run app.py
+
+
+import streamlit as st
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.options import Options
+from bs4 import BeautifulSoup
+import requests
+import json
+import os
+
+# Streamlit UI Configuration
+st.set_page_config(page_title="PrivateGPT Web Scraper", layout="wide")
+st.title("🕵️‍♂️ PrivateGPT Web Scraper & Legalese Report Generator")
+
+# Function to Scrape Website
+def scrape_website(url):
+    """Scrapes website data using Selenium and BeautifulSoup"""
+    try:
+        # Configure headless Chrome
+        chrome_options = Options()
+        chrome_options.add_argument("--headless")
+        chrome_options.add_argument("--disable-gpu")
+        chrome_options.add_argument("--no-sandbox")
+        chrome_options.add_argument("--disable-dev-shm-usage")
+
+        service = Service("/path/to/chromedriver")  # Adjust for system
+        driver = webdriver.Chrome(service=service, options=chrome_options)
+
+        # Fetch website content
+        driver.get(url)
+        html = driver.page_source
+        driver.quit()
+
+        # Parse content
+        soup = BeautifulSoup(html, "html.parser")
+        text_content = soup.get_text(separator="\n")
+
+        return text_content[:5000]  # Limit text length
+    except Exception as e:
+        return f"Error scraping website: {str(e)}"
+
+# Function to Query PrivateGPT
+def query_privategpt(prompt):
+    """Sends query to PrivateGPT"""
+    try:
+        response = requests.post(
+            "http://localhost:8001/api/v1/query",
+            json={"query": prompt},
+            headers={"Content-Type": "application/json"}
+        )
+        data = response.json()
+        return data.get("response", "No response from PrivateGPT")
+    except Exception as e:
+        return f"Error querying PrivateGPT: {str(e)}"
+
+# Streamlit Input Fields
+url = st.text_input("Enter URL to Scrape", placeholder="https://example.com")
+generate_legalese = st.checkbox("Generate Legalese Report")
+analyze_button = st.button("Scrape & Analyze")
+
+if analyze_button and url:
+    with st.spinner("Scraping website..."):
+        raw_data = scrape_website(url)
+        st.subheader("Raw Scraped Data")
+        st.text_area("Extracted Text", raw_data, height=200)
+
+    with st.spinner("Analyzing with PrivateGPT..."):
+        analysis_result = query_privategpt(f"Analyze the following web data:\n\n{raw_data}")
+        st.subheader("PrivateGPT Analysis")
+        st.write(analysis_result)
+
+    if generate_legalese:
+        with st.spinner("Generating Legalese Report..."):
+            legalese_report = query_privategpt(f"""
+            Transform the following text into a formal legal document format:
+            
+            {raw_data}
+            
+            Structure it like a contract or compliance report using proper legal terminology.
+            """)
+            st.subheader("Legalese Report")
+            st.text_area("Generated Legal Document", legalese_report, height=300)
+
+            # Provide a Download Option
+            report_filename = "legal_report.txt"
+            with open(report_filename, "w") as file:
+                file.write(legalese_report)
+            
+            st.download_button(
+                label="Download Legalese Report",
+                data=legalese_report,
+                file_name="legalese_report.txt",
+                mime="text/plain"
+            )
+
+
+
+
+
+
+
